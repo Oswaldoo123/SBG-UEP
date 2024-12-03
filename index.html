@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Plantas Medicinales del Ecuador</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f6f0;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #2ecc71;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .plant-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .plant-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        .plant-card:hover {
+            transform: scale(1.05);
+        }
+        .plant-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+        .plant-content {
+            padding: 15px;
+        }
+        .plant-name {
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.7);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 70%;
+            max-width: 600px;
+            text-align: center;
+        }
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .details-btn {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .details-btn:hover {
+            background-color: #27ae60;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Plantas Medicinales del Ecuador</h1>
+        <p>Descubre la rica biodiversidad medicinal de nuestro país</p>
+    </header>
+
+    <div class="container">
+        <div class="plant-grid" id="plantGrid">
+            <!-- Las plantas se generarán dinámicamente con JavaScript -->
+        </div>
+    </div>
+
+    <div id="plantModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2 id="modalPlantName"></h2>
+            <img id="modalPlantImage" src="" alt="" style="max-width: 100%; max-height: 300px;">
+            <p id="modalPlantDescription"></p>
+        </div>
+    </div>
+
+    <script>
+        const plants = [
+            {
+                name: "Guayusa",
+                description: "Planta amazónica conocida por sus propiedades energéticas y medicinales. Tradicional en las comunidades indígenas, se prepara como té y se usa para mejorar la concentración y combatir la fatiga.",
+                image: "https://upload.wikimedia.org/wikipedia/commons/f/f9/View_of_Ilex_guayusa_from_above.jpg"
+            },
+            {
+                name: "Ortiga",
+                description: "Planta medicinal con múltiples beneficios. Ayuda a reducir la inflamación, mejorar la circulación sanguínea y tiene propiedades diuréticas. Se utiliza comúnmente en infusiones y cataplasmas.",
+                image: "https://www.ericfavre.com/lifestyle/es/wp-content/uploads/sites/8/2021/09/rendered-2-1.jpg"
+            },
+            {
+                name: "Sangre de Drago",
+                description: "Resina extraída de árboles amazónicos con potentes propiedades cicatrizantes y antiinflamatorias. Tradicional en la medicina indígena para tratar heridas, úlceras y problemas digestivos.",
+                image: "https://www.albanatur.com/blog/269-single-default/sangre-de-dragon-el-mejor-antiarrugas-natural.jpg"
+            },
+            {
+                name: "Hierba Luisa",
+                description: "Planta aromática muy común en el Ecuador. Conocida por sus propiedades digestivas, ayuda a calmar los nervios, reduce la hinchazón y se usa frecuentemente en infusiones y tés.",
+                image: "https://asociacionelrosal.org/es/wp-content/uploads/2023/07/hierba-luisa.jpg"
+            },
+            {
+                name: "Boldo",
+                description: "Arbusto medicinal nativo de Sudamérica. Ayuda a la digestión, desintoxica el hígado y alivia problemas estomacales. Se consume principalmente en infusiones.",
+                image: "https://www.infobae.com/new-resizer/eXwiFrMGBHSvs3r0KCPRMVpBiNQ=/arc-anglerfish-arc2-prod-infobae/public/T3RGIGUYMBA4PNUADJESOVTXBM.jpg"
+            },
+            {
+                name: "Manzanilla",
+                description: "Planta medicinal mundialmente conocida. En Ecuador se usa para calmar la ansiedad, mejorar la digestión, reducir la inflamación y aliviar dolores menstruales.",
+                image:"https://acdn.mitiendanube.com/stores/002/036/238/products/captura-de-pantalla-2022-02-18-a-las-16-33-391-5fd9fae548049bba4616452281101463-1024-1024.png"
+            }
+        ];
+
+        function createPlantCards() {
+            const plantGrid = document.getElementById('plantGrid');
+            
+            plants.forEach((plant, index) => {
+                const plantCard = document.createElement('div');
+                plantCard.classList.add('plant-card');
+                plantCard.innerHTML = `
+                    <img src="${plant.image}" alt="${plant.name}" class="plant-image">
+                    <div class="plant-content">
+                        <h2 class="plant-name">${plant.name}</h2>
+                        <button class="details-btn" onclick="openModal(${index})">Ver Detalles</button>
+                    </div>
+                `;
+                plantGrid.appendChild(plantCard);
+            });
+        }
+
+        function openModal(index) {
+            const modal = document.getElementById('plantModal');
+            const plant = plants[index];
+            
+            document.getElementById('modalPlantName').textContent = plant.name;
+            document.getElementById('modalPlantImage').src = plant.image;
+            document.getElementById('modalPlantDescription').textContent = plant.description;
+            
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('plantModal');
+            modal.style.display = 'none';
+        }
+
+        // Cerrar modal si se hace clic fuera de él
+        window.onclick = function(event) {
+            const modal = document.getElementById('plantModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Inicializar las tarjetas cuando se carga la página
+        window.onload = createPlantCards;
+    </script>
+</body>
+</html>
